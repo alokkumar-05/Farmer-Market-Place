@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register • Farmer Marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container" style="max-width: 600px; padding-top: 40px;">
+      <div style="margin-bottom: 24px;">
+        <a href="/login.html" style="color: var(--accent); font-size: 24px; text-decoration: none;">&larr;</a>
+        <h2 style="color: var(--accent); font-size: 18px; font-weight: 600; margin: 8px 0 0 0;">Create account</h2>
+      </div>
+      
+      <h1 style="color: var(--accent); font-size: 28px; font-weight: 700; margin: 0 0 24px 0; text-align: center;">Create Account</h1>
+
+      <section class="card" style="padding: 24px;">
+        <form id="registerForm">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Name *</label>
+            <input name="name" placeholder="Enter your name" required />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Email *</label>
+            <input name="email" type="email" placeholder="Enter your email" required />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Password *</label>
+            <input name="password" type="password" placeholder="Enter password" required />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Phone</label>
+            <input name="phone" type="tel" placeholder="Enter phone number" />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Location</label>
+            <input name="location" placeholder="Enter your location" />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Role *</label>
+            <select name="role" style="padding: 12px;">
+              <option value="buyer">Buyer</option>
+              <option value="farmer">Farmer</option>
+            </select>
+          </div>
+          <button type="submit" class="btn" style="width: 100%;">Register</button>
+          <button type="button" class="btn-outline" style="width: 100%; padding: 14px; border-radius: 8px; margin-top: 8px; cursor: pointer; font-size: 16px; font-weight: 600;" onclick="window.location.href='/login.html'">Already have an account? Login</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+    <script type="module">
+      import { mountRegisterForm } from '/app.js';
+      mountRegisterForm();
+    </script>
+  </body>
+</html>

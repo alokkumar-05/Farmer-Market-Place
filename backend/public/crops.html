@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crops • Farmer Marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <h1>Marketplace</h1>
+      <nav>
+        <a href="/">🏪 Feed</a>
+        <span id="auth-links">
+          <a href="/login.html">Login</a>
+          <a href="/register.html" class="btn" style="padding: 8px 16px;">Register</a>
+        </span>
+        <a href="#" id="profileLink" hidden>👤 Profile</a>
+        <button id="logoutBtn" class="btn-outline" style="padding: 8px 16px;" hidden>Logout</button>
+      </nav>
+    </header>
+
+    <main class="container" style="padding: 16px;">
+      <div id="crops" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      <button id="addProductBtn" class="fab" hidden title="Add Product">+</button>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+    <script type="module">
+      import { initAuthUI, listCrops } from '/app.js';
+      initAuthUI();
+      listCrops({ mountId: 'crops' });
+    </script>
+  </body>
+</html>

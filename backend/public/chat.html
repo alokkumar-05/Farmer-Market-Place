@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat • Farmer Marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <h1>Chat</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/crops.html">Crops</a>
+        <a href="/chat.html">Chat</a>
+        <span id="auth-links">
+          <a href="/login.html">Login</a>
+          <a href="/register.html" class="btn">Register</a>
+        </span>
+        <button id="logoutBtn" class="btn btn-outline" hidden>Logout</button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <p class="muted">This is a placeholder. Socket.IO chat UI can be wired here once the chat API is available.</p>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+    <script type="module">
+      import { initAuthUI } from '/app.js';
+      initAuthUI();
+    </script>
+  </body>
+</html>
