@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 import Colors from '../constants/Colors';
 import ProductCard from '../components/ProductCard';
-import { api } from '../services/api';
+import { getAllCrops } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProductListScreen({ navigation }) {
@@ -13,11 +13,18 @@ export default function ProductListScreen({ navigation }) {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/products');
-      const data = res?.data ?? res;
-      setProducts(Array.isArray(data) ? data : data?.items || []);
+      const res = await getAllCrops();
+      const payload = res?.data?.data || res?.data || res;
+      const items = Array.isArray(payload) ? payload : [];
+      // Normalize for UI component expectations
+      const normalized = items.map((it) => ({
+        ...it,
+        imageUrl: it.imageUrl || it.image?.url,
+        farmerName: it.farmerName || it.farmer?.name,
+      }));
+      setProducts(normalized);
     } catch (e) {
-      // noop
+      setProducts([]);
     } finally {
       setLoading(false);
     }

@@ -20,19 +20,63 @@ const RegisterScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    // Validate required fields
     if (!formData.name || !formData.email || !formData.password) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert('Error', 'Please fill in all required fields (Name, Email, Password)');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
       return;
     }
 
     setLoading(true);
     try {
+      console.log('Attempting registration for:', formData.email);
       const response = await registerUser(formData);
+      console.log('Registration response received:', response.data?.success);
+      
       // Backend returns { success: true, data: { user data with token } }
-      await login(response.data.data);
-      Alert.alert('Success', 'Registration successful!');
+      const userData = response.data?.data || response.data;
+      
+      // Validate response data
+      if (!userData || !userData.token) {
+        throw new Error('Invalid response from server. Missing authentication token.');
+      }
+      
+      console.log('Registration successful for user:', userData.name);
+      await login(userData);
+      // Navigation will happen automatically via AuthContext change
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || error.message || 'Registration failed');
+      console.error('Registration error:', error);
+      
+      let errorMsg = 'Registration failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with an error
+        errorMsg = error.response.data?.message || 
+                   `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request made but no response
+        errorMsg = 'Cannot connect to server.\n\nPlease check:\n' +
+                   '• Backend server is running\n' +
+                   '• Your device is on the same WiFi\n' +
+                   '• Check the Expo console for the API URL';
+      } else if (error.message) {
+        // Something else happened
+        errorMsg = error.message;
+      }
+      
+      Alert.alert('Registration Error', errorMsg);
     } finally {
       setLoading(false);
     }

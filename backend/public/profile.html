@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile • Farmer Marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <h1>Profile</h1>
+      <nav>
+        <a href="/buyer">🏪 Feed</a>
+        <a href="/farmer">📦 My Products</a>
+        <a href="/chat">💬 Chat</a>
+        <button id="logoutBtn" class="btn-outline" style="padding: 8px 16px;" hidden>Logout</button>
+      </nav>
+    </header>
+
+    <main class="container" style="padding: 16px;">
+      <div id="profile"></div>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+    <script type="module">
+      import { mountProfilePage } from '/app.js';
+      mountProfilePage();
+    </script>
+  </body>
+</html>

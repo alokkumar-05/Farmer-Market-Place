@@ -63,17 +63,20 @@ const getCropById = asyncHandler(async (req, res) => {
  * @access Private/Farmer
  */
 const createCrop = asyncHandler(async (req, res) => {
-  const { name, description, price, unit, quantity, category, imageBase64 } =
+  const { name, description, price, unit, quantity, category, imageBase64, imageUrl } =
     req.body;
 
   // Validate required fields
-  if (!name || !description || !price || !quantity || !imageBase64) {
+  if (!name || !description || !price || !quantity || (!imageBase64 && !imageUrl)) {
     res.status(400);
-    throw new Error('Please provide all required fields including image');
+    throw new Error('Please provide all required fields including an image (base64 or URL)');
   }
 
-  // Upload image to Cloudinary
-  const imageData = await uploadImageToCloudinary(imageBase64);
+  // Prepare image data: upload if base64 provided, else use direct URL
+  let imageData = { url: imageUrl || '', publicId: '' };
+  if (imageBase64) {
+    imageData = await uploadImageToCloudinary(imageBase64);
+  }
 
   // Create crop
   const crop = await Crop.create({
@@ -125,7 +128,7 @@ const updateCrop = asyncHandler(async (req, res) => {
     throw new Error('Not authorized to update this crop');
   }
 
-  const { name, description, price, unit, quantity, category, imageBase64 } =
+  const { name, description, price, unit, quantity, category, imageBase64, imageUrl } =
     req.body;
 
   // Update image if new one is provided
@@ -137,6 +140,9 @@ const updateCrop = asyncHandler(async (req, res) => {
     }
     // Upload new image
     imageData = await uploadImageToCloudinary(imageBase64);
+  } else if (imageUrl) {
+    // If a direct URL provided, replace without Cloudinary
+    imageData = { url: imageUrl, publicId: '' };
   }
 
   // Update crop fields

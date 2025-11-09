@@ -7,7 +7,7 @@ import ChatBubble from '../components/ChatBubble';
 import Colors from '../constants/Colors';
 
 const ChatScreen = ({ route, navigation }) => {
-  const { farmerId, farmerName, cropId } = route.params;
+  const { farmerId, farmerName, cropId } = route?.params || {};
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -15,9 +15,9 @@ const ChatScreen = ({ route, navigation }) => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    fetchMessages();
+    if (farmerId) fetchMessages();
     setupSocketListener();
-    navigation.setOptions({ title: `Chat with ${farmerName}` });
+    navigation.setOptions({ title: farmerName ? `Chat with ${farmerName}` : 'Chat' });
   }, []);
 
   const fetchMessages = async () => {
@@ -37,15 +37,16 @@ const ChatScreen = ({ route, navigation }) => {
       setMessages((prev) => [...prev, message]);
     });
     onUserTyping(({ senderId, receiverId }) => {
-      if (senderId === farmerId) setIsTyping(true);
+      if (farmerId && senderId === farmerId) setIsTyping(true);
     });
     onUserStoppedTyping(({ senderId, receiverId }) => {
-      if (senderId === farmerId) setIsTyping(false);
+      if (farmerId && senderId === farmerId) setIsTyping(false);
     });
   };
 
   const handleSend = () => {
     if (!inputText.trim()) return;
+    if (!farmerId) return; // require a receiver to send
 
     const messageData = {
       senderId: user._id,

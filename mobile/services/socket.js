@@ -1,10 +1,21 @@
 import { io } from 'socket.io-client';
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 /**
- * Socket.IO server URL - Update with your backend server
- * Use your machine's IP address for local development
+ * Resolve Socket.IO server URL dynamically for development
+ * Uses Expo host when available, otherwise falls back to emulator/localhost
  */
-const SOCKET_URL = 'http://192.168.0.86:5000';
+const getDevSocketURL = () => {
+  const host = Constants.expoConfig?.hostUri?.split(':')[0];
+  if (host) {
+    return `http://${host}:5000`;
+  }
+  const localhost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+  return `http://${localhost}:5000`;
+};
+
+const SOCKET_URL = __DEV__ ? getDevSocketURL() : (process.env.SOCKET_URL || getDevSocketURL());
 
 let socket = null;
 

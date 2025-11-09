@@ -27,19 +27,57 @@ const LoginScreen = ({ navigation }) => {
    * Handle user login
    */
   const handleLogin = async () => {
+    // Validate input fields
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
     try {
+      console.log('Attempting login for:', email);
       const response = await loginUser({ email, password });
+      console.log('Login response received:', response.data?.success);
+      
       // Backend returns { success: true, data: { user data with token } }
-      await login(response.data.data);
-      Alert.alert('Success', 'Logged in successfully!');
+      const userData = response.data?.data || response.data;
+      
+      // Validate response data
+      if (!userData || !userData.token) {
+        throw new Error('Invalid response from server. Missing authentication token.');
+      }
+      
+      console.log('Login successful for user:', userData.name);
+      await login(userData);
+      // Navigation will happen automatically via AuthContext change
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || error.message || 'Login failed');
+      console.error('Login error:', error);
+      
+      let errorMsg = 'Login failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with an error
+        errorMsg = error.response.data?.message || 
+                   `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request made but no response
+        errorMsg = 'Cannot connect to server.\n\nPlease check:\n' +
+                   '• Backend server is running\n' +
+                   '• Your device is on the same WiFi\n' +
+                   '• Check the Expo console for the API URL';
+      } else if (error.message) {
+        // Something else happened
+        errorMsg = error.message;
+      }
+      
+      Alert.alert('Login Error', errorMsg);
     } finally {
       setLoading(false);
     }

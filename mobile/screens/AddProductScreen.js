@@ -11,6 +11,7 @@ export default function AddProductScreen({ navigation }) {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [quantity, setQuantity] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async () => {
@@ -21,7 +22,7 @@ export default function AddProductScreen({ navigation }) {
         // optionally upload via Cloudinary if you provide creds in helpers
         // finalImage = await uploadImageToCloudinary(localUri)
       }
-      await api.post('/products', { name, description, price: Number(price), imageUrl: finalImage });
+      await api.post('/crops', { name, description, price: Number(price), quantity: Number(quantity), imageUrl: finalImage });
       Alert.alert('Success', 'Product added');
       navigation.goBack();
     } catch (e) {
@@ -36,6 +37,7 @@ export default function AddProductScreen({ navigation }) {
       <InputField placeholder="Name" value={name} onChangeText={setName} />
       <InputField placeholder="Description" value={description} onChangeText={setDescription} />
       <InputField placeholder="Price" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
+      <InputField placeholder="Quantity" value={quantity} onChangeText={setQuantity} keyboardType="number-pad" />
       <InputField placeholder="Image URL (or integrate upload)" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" />
 
       {submitting ? (

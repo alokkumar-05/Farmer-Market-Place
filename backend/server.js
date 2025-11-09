@@ -12,6 +12,7 @@ import chatRoutes from './routes/chatRoutes.js';
 import initializeSocket from './socket/chatSocket.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import os from 'os';
 
 // Load environment variables
 dotenv.config();
@@ -57,6 +58,18 @@ app.get('/register', (req, res) => {
 app.get('/crops', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'crops.html'));
 });
+app.get('/buyer', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'buyer.html'));
+});
+app.get('/farmer', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'farmer.html'));
+});
+app.get('/add-product', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'add-product.html'));
+});
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
 app.get('/chat', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'chat.html'));
 });
@@ -82,6 +95,16 @@ initializeSocket(io);
 // Start server
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Backend accessible at http://localhost:${PORT}`);
+  // Get local IP for mobile testing
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        console.log(`📱 Mobile access: http://${iface.address}:${PORT}`);
+      }
+    }
+  }
 });

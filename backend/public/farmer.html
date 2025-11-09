@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Farmer Dashboard • Farmer Marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <h1>Farmer</h1>
+      <nav>
+        <a href="/farmer">📦 My Products</a>
+        <a href="/add-product" class="btn" style="padding: 8px 16px;">Add Product</a>
+        <a id="chatLink" href="/chat">💬 Chat</a>
+        <span id="auth-links">
+          <a href="/login.html">Login</a>
+          <a href="/register.html" class="btn" style="padding: 8px 16px;">Register</a>
+        </span>
+        <a href="/profile" id="profileLink" hidden></a>
+        <button id="logoutBtn" class="btn-outline" style="padding: 8px 16px;" hidden>Logout</button>
+      </nav>
+    </header>
+
+    <main class="container" style="padding: 16px;">
+      <div id="myProducts" style="display: flex; flex-direction: column; gap: 12px;"></div>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+    <script type="module">
+      import { mountFarmerDashboard } from '/app.js';
+      mountFarmerDashboard();
+    </script>
+  </body>
+</html>

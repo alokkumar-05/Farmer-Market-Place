@@ -5,13 +5,16 @@ import ProductListScreen from '../screens/ProductListScreen';
 import AddProductScreen from '../screens/AddProductScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import BuyerDashboardScreen from '../screens/BuyerDashboardScreen';
+import FarmerDashboardScreen from '../screens/FarmerDashboardScreen';
 import Colors from '../constants/Colors';
 import { Text } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function FeedStack() {
+function FeedStack({ role }) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -20,6 +23,11 @@ function FeedStack() {
         headerTitleStyle: { color: Colors.primary, fontWeight: '700' },
       }}
     >
+      {role === 'farmer' ? (
+        <Stack.Screen name="FarmerDashboard" component={FarmerDashboardScreen} options={{ title: 'My Products' }} />
+      ) : (
+        <Stack.Screen name="BuyerDashboard" component={BuyerDashboardScreen} options={{ title: 'Marketplace' }} />
+      )}
       <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Marketplace' }} />
       <Stack.Screen name="AddProduct" component={AddProductScreen} options={{ title: 'Add Product' }} />
       <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
@@ -28,6 +36,8 @@ function FeedStack() {
 }
 
 export default function AppNavigator() {
+  const { user } = useAuth();
+  const role = user?.role;
   return (
     <Tab.Navigator
       screenOptions={{
@@ -39,10 +49,10 @@ export default function AppNavigator() {
     >
       <Tab.Screen
         name="Feed"
-        component={FeedStack}
+        children={() => <FeedStack role={role} />}
         options={{
-          tabBarLabel: 'Feed',
-          tabBarIcon: ({ color, size }) => <Text style={{ color }}>🏪</Text>,
+          tabBarLabel: role === 'farmer' ? 'My Products' : 'Feed',
+          tabBarIcon: ({ color }) => <Text style={{ color }}>{role === 'farmer' ? '📦' : '🏪'}</Text>,
         }}
       />
       <Tab.Screen
