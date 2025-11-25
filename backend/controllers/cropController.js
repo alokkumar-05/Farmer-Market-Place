@@ -63,8 +63,19 @@ const getCropById = asyncHandler(async (req, res) => {
  * @access Private/Farmer
  */
 const createCrop = asyncHandler(async (req, res) => {
-  const { name, description, price, unit, quantity, category, imageBase64, imageUrl } =
-    req.body;
+  const {
+    name,
+    description,
+    price,
+    price10kg,
+    price25kg,
+    price50kg,
+    unit,
+    quantity,
+    category,
+    imageBase64,
+    imageUrl,
+  } = req.body;
 
   // Validate required fields
   if (!name || !description || !price || !quantity || (!imageBase64 && !imageUrl)) {
@@ -84,6 +95,9 @@ const createCrop = asyncHandler(async (req, res) => {
     name,
     description,
     price,
+    price10kg,
+    price25kg,
+    price50kg,
     unit: unit || 'kg',
     quantity,
     category: category || 'other',
@@ -128,8 +142,19 @@ const updateCrop = asyncHandler(async (req, res) => {
     throw new Error('Not authorized to update this crop');
   }
 
-  const { name, description, price, unit, quantity, category, imageBase64, imageUrl } =
-    req.body;
+  const {
+    name,
+    description,
+    price,
+    price10kg,
+    price25kg,
+    price50kg,
+    unit,
+    quantity,
+    category,
+    imageBase64,
+    imageUrl,
+  } = req.body;
 
   // Update image if new one is provided
   let imageData = crop.image;
@@ -149,6 +174,9 @@ const updateCrop = asyncHandler(async (req, res) => {
   crop.name = name || crop.name;
   crop.description = description || crop.description;
   crop.price = price !== undefined ? price : crop.price;
+  if (price10kg !== undefined) crop.price10kg = price10kg;
+  if (price25kg !== undefined) crop.price25kg = price25kg;
+  if (price50kg !== undefined) crop.price50kg = price50kg;
   crop.unit = unit || crop.unit;
   crop.quantity = quantity !== undefined ? quantity : crop.quantity;
   crop.category = category || crop.category;

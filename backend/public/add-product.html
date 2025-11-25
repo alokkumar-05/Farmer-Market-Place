@@ -25,11 +25,45 @@
           <label>Description *</label>
           <textarea name="description" rows="3" placeholder="Short description" required></textarea>
 
-          <label>Price (₹) *</label>
-          <input type="number" step="0.01" name="price" required />
+          <label>Price for 20</label>
+          <div class="inline-unit-row">
+            <input type="number" step="0.01" name="price20" required />
+            <select name="priceUnit20" class="price-unit-select">
+              <option value="kg" selected>kg</option>
+              <option value="litre">litre</option>
+              <option value="dozen">dozen</option>
+            </select>
+          </div>
 
-          <label>Quantity *</label>
-          <input type="number" step="1" name="quantity" required />
+          <label>Price for 50</label>
+          <div class="inline-unit-row">
+            <input type="number" step="0.01" name="price50" required />
+            <select name="priceUnit50" class="price-unit-select">
+              <option value="kg" selected>kg</option>
+              <option value="litre">litre</option>
+              <option value="dozen">dozen</option>
+            </select>
+          </div>
+
+          <label>Price for 100</label>
+          <div class="inline-unit-row">
+            <input type="number" step="0.01" name="price100" required />
+            <select name="priceUnit100" class="price-unit-select">
+              <option value="kg" selected>kg</option>
+              <option value="litre">litre</option>
+              <option value="dozen">dozen</option>
+            </select>
+          </div>
+
+          <label>Quantity Available *</label>
+          <div class="inline-unit-row">
+            <input type="number" step="1" name="quantity" required />
+            <select name="quantityUnit" class="price-unit-select" disabled>
+              <option value="kg" selected>kg</option>
+              <option value="litre">litre</option>
+              <option value="dozen">dozen</option>
+            </select>
+          </div>
 
           <label>Category</label>
           <select name="category">
@@ -41,10 +75,11 @@
             <option value="other" selected>Other</option>
           </select>
 
-          <label>Image URL *</label>
-          <input name="imageUrl" type="url" placeholder="https://..." required />
+          <label>Product Image *</label>
+          <input name="imageFile" type="file" accept="image/*" required />
+          <small class="muted">Choose a photo from your device gallery.</small>
 
-          <button type="submit" class="btn">Save</button>
+          <button type="submit" class="btn-primary">Save</button>
         </form>
       </section>
     </main>

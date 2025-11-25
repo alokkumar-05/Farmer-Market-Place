@@ -8,14 +8,14 @@ const getDevApiBaseURL = () => {
   // When running with Expo Go on a physical device, hostUri contains the IP address
   // Format: "192.168.x.x:8081" or "192.168.x.x:19000"
   const hostUri = Constants.expoConfig?.hostUri || Constants.manifest?.hostUri;
-  
+
   if (hostUri) {
     const host = hostUri.split(':').shift();
     const apiUrl = `http://${host}:5000/api`;
     console.log('📍 Using Expo hostUri for API:', apiUrl);
     return apiUrl;
   }
-  
+
   // Fallbacks for emulators/simulators
   if (Platform.OS === 'android') {
     console.log('📍 Using Android emulator localhost (10.0.2.2)');
@@ -24,7 +24,7 @@ const getDevApiBaseURL = () => {
     console.log('📍 Using iOS simulator localhost');
     return 'http://localhost:5000/api';
   }
-  
+
   // Default fallback
   console.log('📍 Using default localhost');
   return 'http://localhost:5000/api';
@@ -96,6 +96,8 @@ export const updateUserProfile = (userData) => api.put('/auth/profile', userData
 export const getAllCrops = (params) => api.get('/crops', { params });
 export const getMyCrops = () => api.get('/crops/my-crops');
 export const createCrop = (data) => api.post('/crops', data);
+export const updateCrop = (id, data) => api.put(`/crops/${id}`, data);
+export const deleteCrop = (id) => api.delete(`/crops/${id}`);
 
 // ===== CHAT API =====
 export const getChatHistory = (userId) => api.get(`/chat/${userId}`);

@@ -17,7 +17,21 @@ const ChatScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (farmerId) fetchMessages();
     setupSocketListener();
-    navigation.setOptions({ title: farmerName ? `Chat with ${farmerName}` : 'Chat' });
+    navigation.setOptions({
+      title: farmerName ? `Chat with ${farmerName}` : 'Chat',
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('PublicProfile', {
+              user: { _id: farmerId, name: farmerName, role: 'User' }, // Role is a placeholder, ideally fetch full user details
+            })
+          }
+          style={{ paddingHorizontal: 16 }}
+        >
+          <Text style={{ fontSize: 24 }}>👤</Text>
+        </TouchableOpacity>
+      ),
+    });
   }, []);
 
   const fetchMessages = async () => {
@@ -70,7 +84,11 @@ const ChatScreen = ({ route, navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -107,8 +125,25 @@ const ChatScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   messageList: { padding: 8, paddingBottom: 16 },
-  inputContainer: { flexDirection: 'row', padding: 12, backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border },
-  input: { flex: 1, backgroundColor: Colors.background, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, marginRight: 8, maxHeight: 100, color: Colors.text },
+  inputContainer: {
+    flexDirection: 'row',
+    padding: 12,
+    backgroundColor: Colors.white,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    alignItems: 'center',
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12, // Extra padding for iOS home indicator
+  },
+  input: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: 8,
+    maxHeight: 100,
+    color: Colors.text,
+  },
   sendButton: { backgroundColor: Colors.primary, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10, justifyContent: 'center' },
   sendButtonText: { color: Colors.white, fontWeight: '600' },
   typing: { color: Colors.textLight, marginLeft: 12, marginBottom: 4 },

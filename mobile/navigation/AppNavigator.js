@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import ProductListScreen from '../screens/ProductListScreen';
 import AddProductScreen from '../screens/AddProductScreen';
+import ChatListScreen from '../screens/ChatListScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import BuyerDashboardScreen from '../screens/BuyerDashboardScreen';
@@ -30,7 +31,9 @@ function FeedStack({ role }) {
       )}
       <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Marketplace' }} />
       <Stack.Screen name="AddProduct" component={AddProductScreen} options={{ title: 'Add Product' }} />
+      <Stack.Screen name="ChatList" component={ChatListScreen} options={{ title: 'Messages' }} />
       <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
+      <Stack.Screen name="PublicProfile" component={ProfileScreen} options={{ title: 'Profile' }} />
     </Stack.Navigator>
   );
 }

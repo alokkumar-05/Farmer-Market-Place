@@ -4,6 +4,7 @@ import {
   loginUser,
   getUserProfile,
   updateUserProfile,
+  getUserById,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -36,5 +37,12 @@ router.get('/profile', protect, getUserProfile);
  * @access  Private
  */
 router.put('/profile', protect, updateUserProfile);
+
+/**
+ * @route   GET /api/auth/:id
+ * @desc    Get user by ID (Public Profile)
+ * @access  Private
+ */
+router.get('/:id', protect, getUserById);
 
 export default router;

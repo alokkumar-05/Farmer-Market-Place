@@ -15,7 +15,7 @@ export default function BuyerDashboardScreen({ navigation }) {
     navigation.setOptions({
       title: 'Marketplace',
       headerRight: () => (
-        <Pressable onPress={() => navigation.navigate('Chat')} style={{ paddingHorizontal: 12 }}>
+        <Pressable onPress={() => navigation.navigate('ChatList')} style={{ paddingHorizontal: 12 }}>
           <Text style={{ fontSize: 18 }}>💬</Text>
         </Pressable>
       ),
@@ -60,7 +60,7 @@ export default function BuyerDashboardScreen({ navigation }) {
         <FlatList
           data={items}
           keyExtractor={(item) => item.id?.toString() || item._id?.toString() || Math.random().toString()}
-          renderItem={({ item }) => <ProductCard product={item} onPress={() => onCardPress(item)} />}
+          renderItem={({ item }) => <ProductCard product={item} isFarmer={false} onPress={() => onCardPress(item)} />}
           contentContainerStyle={{ padding: 16 }}
         />
       )}

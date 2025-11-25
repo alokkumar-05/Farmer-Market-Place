@@ -147,4 +147,30 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, getUserProfile, updateUserProfile };
+/**
+ * Get user by ID (Public Profile)
+ * @route GET /api/auth/:id
+ * @access Private
+ */
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select('-password');
+
+  if (user) {
+    res.json({
+      success: true,
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        location: user.location,
+      },
+    });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
+export { registerUser, loginUser, getUserProfile, updateUserProfile, getUserById };

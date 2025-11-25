@@ -25,6 +25,26 @@ const cropSchema = new mongoose.Schema(
       required: [true, 'Please provide price'],
       min: 0,
     },
+    price10kg: {
+      type: Number,
+      min: 0,
+    },
+    price20kg: {
+      type: Number,
+      min: 0,
+    },
+    price25kg: {
+      type: Number,
+      min: 0,
+    },
+    price50kg: {
+      type: Number,
+      min: 0,
+    },
+    price100kg: {
+      type: Number,
+      min: 0,
+    },
     unit: {
       type: String,
       default: 'kg',

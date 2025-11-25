@@ -4,9 +4,20 @@ import Colors from '../constants/Colors';
 import PrimaryButton from '../components/PrimaryButton';
 import { useAuth } from '../context/AuthContext';
 
-export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+export default function ProfileScreen({ route, navigation }) {
+  const { user: authUser, logout } = useAuth();
   const [loading, setLoading] = React.useState(false);
+
+  // Check if we are viewing another user's profile
+  const publicUser = route?.params?.user;
+  const isPublic = !!publicUser;
+  const displayUser = isPublic ? publicUser : authUser;
+
+  React.useLayoutEffect(() => {
+    if (isPublic) {
+      navigation.setOptions({ title: 'Profile' });
+    }
+  }, [navigation, isPublic]);
 
   const onLogout = async () => {
     setLoading(true);
@@ -21,13 +32,15 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>{isPublic ? 'User Profile' : 'My Profile'}</Text>
       <View style={styles.card}>
-        <Row label="Name" value={user?.name || '-'} />
-        <Row label="Email" value={user?.email || '-'} />
-        <Row label="Role" value={user?.role || '-'} />
+        <Row label="Name" value={displayUser?.name || '-'} />
+        <Row label="Email" value={displayUser?.email || '-'} />
+        <Row label="Role" value={displayUser?.role || '-'} />
       </View>
-      <PrimaryButton title={loading ? 'Logging out...' : 'Logout'} onPress={onLogout} disabled={loading} />
+      {!isPublic && (
+        <PrimaryButton title={loading ? 'Logging out...' : 'Logout'} onPress={onLogout} disabled={loading} />
+      )}
     </View>
   );
 }

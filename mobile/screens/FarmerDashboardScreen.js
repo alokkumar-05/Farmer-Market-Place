@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Text, Pressable } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Text, Pressable, Alert } from 'react-native';
 import Colors from '../constants/Colors';
 import ProductCard from '../components/ProductCard';
-import { getMyCrops } from '../services/api';
+import { getMyCrops, deleteCrop } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function FarmerDashboardScreen({ navigation }) {
@@ -16,7 +16,7 @@ export default function FarmerDashboardScreen({ navigation }) {
     navigation.setOptions({
       title: 'My Products',
       headerRight: () => (
-        <Pressable onPress={() => navigation.navigate('Chat')} style={{ paddingHorizontal: 12 }}>
+        <Pressable onPress={() => navigation.navigate('ChatList')} style={{ paddingHorizontal: 12 }}>
           <Text style={{ fontSize: 18 }}>💬</Text>
         </Pressable>
       ),
@@ -45,6 +45,28 @@ export default function FarmerDashboardScreen({ navigation }) {
     }
   };
 
+  const handleDelete = (item) => {
+    Alert.alert('Delete Product', 'Are you sure you want to delete this product?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteCrop(item._id);
+            fetchMine(); // Refresh list
+          } catch (error) {
+            Alert.alert('Error', 'Failed to delete product');
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleEdit = (item) => {
+    navigation.navigate('AddProduct', { product: item });
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -53,7 +75,15 @@ export default function FarmerDashboardScreen({ navigation }) {
         <FlatList
           data={items}
           keyExtractor={(item) => item.id?.toString() || item._id?.toString() || Math.random().toString()}
-          renderItem={({ item }) => <ProductCard product={item} onPress={() => {}} />}
+          renderItem={({ item }) => (
+            <ProductCard
+              product={item}
+              isFarmer={true}
+              onDelete={() => handleDelete(item)}
+              onEdit={() => handleEdit(item)}
+              onPress={() => { }}
+            />
+          )}
           contentContainerStyle={{ padding: 16 }}
         />
       )}

@@ -1,36 +1,58 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chat • Farmer Marketplace</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="container">
-      <h1>Chat</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/crops.html">Crops</a>
-        <a href="/chat.html">Chat</a>
-        <span id="auth-links">
-          <a href="/login.html">Login</a>
-          <a href="/register.html" class="btn">Register</a>
-        </span>
-        <button id="logoutBtn" class="btn btn-outline" hidden>Logout</button>
-      </nav>
-    </header>
 
-    <main class="container">
-      <section class="card">
-        <p class="muted">This is a placeholder. Socket.IO chat UI can be wired here once the chat API is available.</p>
-      </section>
-    </main>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat • Farmer Marketplace</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
 
-    <script src="/app.js" type="module"></script>
-    <script type="module">
-      import { initAuthUI } from '/app.js';
-      initAuthUI();
-    </script>
-  </body>
+<body>
+  <header class="container">
+    <h1>Chat</h1>
+    <nav>
+      <a href="/buyer">Home</a>
+      <a href="/farmer">My Products</a>
+      <a href="/chat">Chat</a>
+      <span id="auth-links">
+        <a href="/login">Login</a>
+        <a href="/register" class="btn">Register</a>
+      </span>
+      <a href="/profile" id="profileLink" hidden></a>
+      <button id="logoutBtn" class="btn-outline" hidden>Logout</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Top card showing product & farmer info -->
+    <section id="chatCard" class="chat-card">
+      <div class="chat-card-left" id="chatCardImage">Image</div>
+      <div class="chat-card-right">
+        <h2 id="chatProductTitle">Chat</h2>
+        <p id="chatProductDesc" class="chat-product-desc muted">Select a product to start chatting with the farmer.</p>
+        <p id="chatProductMeta" class="chat-product-meta muted"></p>
+      </div>
+    </section>
+
+    <!-- Chat panel -->
+    <section class="card chat-panel">
+      <div id="chatListContainer" class="chat-list-container" hidden></div>
+      <div id="chatMessages" class="chat-messages"></div>
+      <form id="chatForm" class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Type your message..." autocomplete="off" required />
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Socket.IO client -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js" type="module"></script>
+  <script type="module">
+    import { mountChatPage } from '/app.js';
+    mountChatPage();
+  </script>
+</body>
+
 </html>
