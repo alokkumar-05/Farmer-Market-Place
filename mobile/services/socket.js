@@ -7,6 +7,12 @@ import Constants from 'expo-constants';
  * Uses Expo host when available, otherwise falls back to emulator/localhost
  */
 const getDevSocketURL = () => {
+  // Check for production/configured URL first
+  const configuredUrl = Constants.expoConfig?.extra?.socketUrl;
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
   const host = Constants.expoConfig?.hostUri?.split(':')[0];
   if (host) {
     return `http://${host}:5000`;

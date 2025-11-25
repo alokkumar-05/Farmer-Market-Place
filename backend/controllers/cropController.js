@@ -70,6 +70,7 @@ const createCrop = asyncHandler(async (req, res) => {
     price10kg,
     price25kg,
     price50kg,
+    price100kg,
     unit,
     quantity,
     category,
@@ -98,6 +99,7 @@ const createCrop = asyncHandler(async (req, res) => {
     price10kg,
     price25kg,
     price50kg,
+    price100kg,
     unit: unit || 'kg',
     quantity,
     category: category || 'other',
@@ -149,6 +151,7 @@ const updateCrop = asyncHandler(async (req, res) => {
     price10kg,
     price25kg,
     price50kg,
+    price100kg,
     unit,
     quantity,
     category,
@@ -177,6 +180,7 @@ const updateCrop = asyncHandler(async (req, res) => {
   if (price10kg !== undefined) crop.price10kg = price10kg;
   if (price25kg !== undefined) crop.price25kg = price25kg;
   if (price50kg !== undefined) crop.price50kg = price50kg;
+  if (price100kg !== undefined) crop.price100kg = price100kg;
   crop.unit = unit || crop.unit;
   crop.quantity = quantity !== undefined ? quantity : crop.quantity;
   crop.category = category || crop.category;

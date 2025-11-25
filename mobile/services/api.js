@@ -9,6 +9,13 @@ const getDevApiBaseURL = () => {
   // Format: "192.168.x.x:8081" or "192.168.x.x:19000"
   const hostUri = Constants.expoConfig?.hostUri || Constants.manifest?.hostUri;
 
+  // Check for production/configured URL first
+  const configuredUrl = Constants.expoConfig?.extra?.apiUrl;
+  if (configuredUrl) {
+    console.log('📍 Using configured API URL:', configuredUrl);
+    return configuredUrl;
+  }
+
   if (hostUri) {
     const host = hostUri.split(':').shift();
     const apiUrl = `http://${host}:5000/api`;
