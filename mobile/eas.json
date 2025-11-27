@@ -11,9 +11,21 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "API_URL": "https://farmer-market-place-j1x1.onrender.com/api",
+        "SOCKET_URL": "https://farmer-market-place-j1x1.onrender.com"
       }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "API_URL": "https://farmer-market-place-j1x1.onrender.com/api",
+        "SOCKET_URL": "https://farmer-market-place-j1x1.onrender.com"
+      }
+    }
   },
   "submit": {
     "production": {}

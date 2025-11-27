@@ -21,7 +21,8 @@ export default {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff"
-      }
+      },
+      package: "com.alokkumarswn1.farmermarketplace"
     },
     web: {
       favicon: "./assets/favicon.png"
@@ -29,6 +30,9 @@ export default {
     extra: {
       apiUrl: process.env.API_URL,
       socketUrl: process.env.SOCKET_URL,
+      eas: {
+        projectId: "f4511c46-c7eb-4773-a1c1-d97e5907737a"
+      }
     },
   }
 };
