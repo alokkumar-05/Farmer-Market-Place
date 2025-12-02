@@ -23,6 +23,7 @@ export function setToken(token) {
 
 export function logout() {
   localStorage.removeItem('token');
+  localStorage.removeItem('userInfo');
   location.href = '/';
 }
 
@@ -99,7 +100,7 @@ export async function listCrops({ limit, mountId = 'crops' } = {}) {
 
     const card = el('div', { class: 'product-card' }, [
       el('div', { class: 'product-card-image' }, [
-        el('img', { src: img, alt: product.name || 'Product image' }),
+        el('img', { src: img, alt: product.name || 'Product image', crossorigin: 'anonymous' }),
       ]),
       el('div', { class: 'product-card-content' }, [
         el('div', {}, [
@@ -272,7 +273,7 @@ export async function listMyCrops({ limit, mountId = 'myProducts' } = {}) {
 
     const card = el('div', { class: 'product-card' }, [
       el('div', { class: 'product-card-image' }, [
-        el('img', { src: img, alt: product.name || 'Product image' }),
+        el('img', { src: img, alt: product.name || 'Product image', crossorigin: 'anonymous' }),
       ]),
       el('div', { class: 'product-card-content' }, [
         el('div', {}, [
@@ -352,6 +353,12 @@ export function mountChatPage() {
     alert('Please log in to use chat.');
     location.href = '/login';
     return;
+  }
+
+  // Hide My Products for buyers
+  const navMyProducts = document.getElementById('navMyProducts');
+  if (navMyProducts && info.role !== 'farmer') {
+    navMyProducts.style.display = 'none';
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -601,10 +608,30 @@ export function mountProfilePage() {
       mount.innerHTML = '';
       mount.appendChild(el('div', { class: 'card' }, [
         el('h2', {}, [user?.name || 'User']),
-        el('p', { class: 'muted' }, [user?.email || '']),
+        // Only show email if it's my profile
+        !userId ? el('p', { class: 'muted' }, [user?.email || '']) : null,
         el('p', {}, [String(user?.role || '')]),
-        user.location ? el('p', {}, [`📍 ${user.location}`]) : null
+        user.location ? el('p', {}, [`📍 ${user.location}`]) : null,
+        user.bio ? el('p', { style: 'margin-top: 8px; font-style: italic;' }, [user.bio]) : null,
+        user.address ? el('p', {}, [`🏠 ${user.address}`]) : null,
+        user.phone ? el('p', {}, [`📞 ${user.phone}`]) : null,
+        user.upiId ? el('p', {}, [`💸 UPI: ${user.upiId}`]) : null,
       ]));
+
+      // QR Code Display Logic
+      const qrSection = document.getElementById('qrSection');
+      const qrImage = document.getElementById('qrImage');
+      const qrAccountName = document.getElementById('qrAccountName');
+
+      // Always show QR section if data exists, or if it's my profile (to allow adding)
+      if ((user.qrCode && user.qrCode.url) || !userId) {
+        if (qrSection) qrSection.hidden = false;
+        if (user.qrCode && user.qrCode.url && qrImage) {
+          qrImage.src = user.qrCode.url;
+          qrImage.hidden = false;
+        }
+        if (qrAccountName) qrAccountName.textContent = user.accountHolderName || '';
+      }
 
       // Hide farmer-only navigation for buyers or public view
       const myProductsNav = document.getElementById('navMyProducts');
@@ -614,8 +641,53 @@ export function mountProfilePage() {
         // Public view: hide logout and my products
         if (logoutBtn) logoutBtn.hidden = true;
         if (myProductsNav) myProductsNav.style.display = 'none';
+        // Hide edit forms in public view
+        if (document.getElementById('detailsSection')) document.getElementById('detailsSection').hidden = true;
+        if (document.getElementById('qrInput')) document.getElementById('qrInput').parentElement.hidden = true;
       } else {
-        // My Profile
+        // My Profile - Enable Editing
+        const detailsSection = document.getElementById('detailsSection');
+        if (detailsSection) detailsSection.hidden = false;
+        if (qrSection) qrSection.hidden = false; // Always show for owner to add
+
+        // Populate form
+        if (document.getElementById('bioInput')) document.getElementById('bioInput').value = user.bio || '';
+        if (document.getElementById('addressInput')) document.getElementById('addressInput').value = user.address || '';
+        if (document.getElementById('phoneInput')) document.getElementById('phoneInput').value = user.phone || '';
+        if (document.getElementById('upiInput')) document.getElementById('upiInput').value = user.upiId || '';
+        if (document.getElementById('accountNameInput')) document.getElementById('accountNameInput').value = user.accountHolderName || '';
+
+        // Handle Save
+        const detailsForm = document.getElementById('detailsForm');
+        if (detailsForm) {
+          detailsForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const bio = document.getElementById('bioInput').value;
+            const address = document.getElementById('addressInput').value;
+            const phone = document.getElementById('phoneInput').value;
+            const upiId = document.getElementById('upiInput').value;
+            const accountHolderName = document.getElementById('accountNameInput').value;
+            const qrInput = document.getElementById('qrInput');
+
+            let qrCodeBase64 = null;
+            if (qrInput.files && qrInput.files[0]) {
+              qrCodeBase64 = await toBase64(qrInput.files[0]);
+            }
+
+            try {
+              await api('/api/auth/profile', {
+                method: 'PUT',
+                body: { bio, address, phone, upiId, accountHolderName, qrCodeBase64 }
+              });
+              alert('Profile updated successfully!');
+              location.reload();
+            } catch (err) {
+              console.error(err);
+              alert('Failed to update profile');
+            }
+          };
+        }
+
         if (myProductsNav) {
           if (user?.role !== 'farmer') {
             myProductsNav.style.display = 'none';
@@ -630,6 +702,13 @@ export function mountProfilePage() {
     }
   })();
 }
+
+const toBase64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = error => reject(error);
+});
 
 export function mountAddProductForm() {
   initAuthUI();

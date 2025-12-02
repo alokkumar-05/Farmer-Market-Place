@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { uploadImageToCloudinary, deleteImageFromCloudinary } from '../utils/uploadImage.js';
 
 /**
  * Register a new user (farmer or buyer)
@@ -44,6 +45,11 @@ const registerUser = asyncHandler(async (req, res) => {
         role: user.role,
         phone: user.phone,
         location: user.location,
+        qrCode: user.qrCode,
+        accountHolderName: user.accountHolderName,
+        address: user.address,
+        bio: user.bio,
+        upiId: user.upiId,
         token: generateToken(user._id),
       },
     });
@@ -81,6 +87,11 @@ const loginUser = asyncHandler(async (req, res) => {
         role: user.role,
         phone: user.phone,
         location: user.location,
+        qrCode: user.qrCode,
+        accountHolderName: user.accountHolderName,
+        address: user.address,
+        bio: user.bio,
+        upiId: user.upiId,
         token: generateToken(user._id),
       },
     });
@@ -121,6 +132,24 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
     user.location = req.body.location || user.location;
+    user.accountHolderName = req.body.accountHolderName || user.accountHolderName;
+    user.address = req.body.address || user.address;
+    user.bio = req.body.bio || user.bio;
+    user.upiId = req.body.upiId || user.upiId;
+
+    // Handle QR Code Upload
+    if (req.body.qrCodeBase64) {
+      // Delete old QR code if exists
+      if (user.qrCode && user.qrCode.publicId) {
+        await deleteImageFromCloudinary(user.qrCode.publicId);
+      }
+      // Upload new QR code
+      const imageData = await uploadImageToCloudinary(req.body.qrCodeBase64);
+      user.qrCode = {
+        url: imageData.url,
+        publicId: imageData.publicId,
+      };
+    }
 
     // Update password only if provided
     if (req.body.password) {
@@ -138,6 +167,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         role: updatedUser.role,
         phone: updatedUser.phone,
         location: updatedUser.location,
+        qrCode: updatedUser.qrCode,
+        accountHolderName: updatedUser.accountHolderName,
+        address: updatedUser.address,
+        bio: updatedUser.bio,
+        upiId: updatedUser.upiId,
         token: generateToken(updatedUser._id),
       },
     });
@@ -165,6 +199,11 @@ const getUserById = asyncHandler(async (req, res) => {
         role: user.role,
         phone: user.phone,
         location: user.location,
+        qrCode: user.qrCode,
+        accountHolderName: user.accountHolderName,
+        address: user.address,
+        bio: user.bio,
+        upiId: user.upiId,
       },
     });
   } else {

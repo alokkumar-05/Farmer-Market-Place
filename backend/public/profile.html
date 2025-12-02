@@ -1,30 +1,81 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Profile • Farmer Marketplace</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="container">
-      <h1>Profile</h1>
-      <nav>
-        <a href="/buyer" id="navFeed">🏪 Feed</a>
-        <a href="/farmer" id="navMyProducts">📦 My Products</a>
-        <a href="/chat" id="navChat">💬 Chat</a>
-        <button id="logoutBtn" class="btn-outline" style="padding: 8px 16px;" hidden>Logout</button>
-      </nav>
-    </header>
 
-    <main class="container" style="padding: 16px;">
-      <div id="profile"></div>
-    </main>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile • Farmer Marketplace</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
 
-    <script src="/app.js" type="module"></script>
-    <script type="module">
-      import { mountProfilePage } from '/app.js';
-      mountProfilePage();
-    </script>
-  </body>
+<body>
+  <header class="container">
+    <h1>Profile</h1>
+    <nav>
+      <a href="/buyer" id="navFeed">🏪 Feed</a>
+      <a href="/farmer" id="navMyProducts">📦 My Products</a>
+      <a href="/chat" id="navChat">💬 Chat</a>
+      <button id="logoutBtn" class="btn-outline" style="padding: 8px 16px;" hidden>Logout</button>
+    </nav>
+  </header>
+
+  <main class="container" style="padding: 16px;">
+    <div id="profile"></div>
+
+    <!-- QR Code Section -->
+    <div class="card" id="qrSection" hidden>
+      <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;"
+        onclick="document.getElementById('qrContent').hidden = !document.getElementById('qrContent').hidden">
+        <h3>Payment QR Code</h3>
+        <span>▼</span>
+      </div>
+      <div id="qrContent" hidden style="margin-top: 16px; text-align: center;">
+        <div id="currentQrDisplay">
+          <img id="qrImage" src="" alt="QR Code"
+            style="max-width: 200px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px;" hidden
+            crossorigin="anonymous" />
+          <p id="qrAccountName" style="font-weight: bold;"></p>
+        </div>
+        <div style="margin-top: 16px; text-align: left;">
+          <label>Upload New QR Code</label>
+          <input type="file" id="qrInput" accept="image/*" />
+          <label style="margin-top: 8px;">Account Holder Name</label>
+          <input type="text" id="accountNameInput" placeholder="Your Name" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Details Section -->
+    <div class="card" id="detailsSection" hidden>
+      <h3>Additional Details</h3>
+      <form id="detailsForm">
+        <div class="input-field">
+          <label>Bio</label>
+          <textarea id="bioInput" rows="3" placeholder="Tell us about yourself..."></textarea>
+        </div>
+        <div class="input-field">
+          <label>Address</label>
+          <textarea id="addressInput" rows="2" placeholder="Your full address"></textarea>
+        </div>
+        <div class="input-field">
+          <label>Mobile Number</label>
+          <input type="tel" id="phoneInput" placeholder="Your contact number" maxlength="10" pattern="\d{10}"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" />
+        </div>
+        <div class="input-field">
+          <label>UPI ID (Optional)</label>
+          <input type="text" id="upiInput" placeholder="username@upi" />
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Save Details</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="/app.js" type="module"></script>
+  <script type="module">
+    import { mountProfilePage } from '/app.js';
+    mountProfilePage();
+  </script>
+</body>
+
 </html>

@@ -98,6 +98,7 @@ export const registerUser = (userData) => api.post('/auth/register', userData);
 export const loginUser = (credentials) => api.post('/auth/login', credentials);
 export const getUserProfile = () => api.get('/auth/profile');
 export const updateUserProfile = (userData) => api.put('/auth/profile', userData);
+export const getUserById = (id) => api.get(`/auth/${id}`);
 
 // ===== CROPS =====
 export const getAllCrops = (params) => api.get('/crops', { params });
