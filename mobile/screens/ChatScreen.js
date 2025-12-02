@@ -94,7 +94,10 @@ const ChatScreen = ({ route, navigation }) => {
         data={messages}
         keyExtractor={(item, index) => item._id || index.toString()}
         renderItem={({ item }) => (
-          <ChatBubble message={item} isCurrentUser={item.sender._id === user._id || item.sender === user._id} />
+          <ChatBubble
+            message={item}
+            isCurrentUser={String(item.sender?._id || item.sender) === String(user._id)}
+          />
         )}
         contentContainerStyle={styles.messageList}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd()}

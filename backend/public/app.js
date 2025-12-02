@@ -372,6 +372,114 @@ export function mountChatPage() {
   let cropId = cropIdParam || '';
   let otherUserName = farmerNameParam || 'Farmer';
 
+  // Helper to append message to UI
+  const appendMessage = (msg) => {
+    if (!msg) return;
+    const senderId = String(msg.sender?._id || msg.sender);
+    const receiverId = String(msg.receiver?._id || msg.receiver);
+    const currentUserId = String(info._id);
+    const targetUserId = otherUserId ? String(otherUserId) : '';
+
+    // If this is the first message and we don't know the other user yet,
+    // infer them from the message (so farmer opening /chat directly still sees messages).
+    if (!targetUserId) {
+      otherUserId = senderId === currentUserId ? receiverId : senderId;
+    }
+
+    // Only show messages in this conversation once we have the other user ID
+    // We compare with the updated otherUserId (which might have just been set)
+    const activeTargetId = String(otherUserId);
+
+    if (
+      !(
+        (senderId === currentUserId && receiverId === activeTargetId) ||
+        (senderId === activeTargetId && receiverId === currentUserId)
+      )
+    ) {
+      return;
+    }
+
+    const isMe = senderId === currentUserId;
+    const row = document.createElement('div');
+    row.className = 'chat-row ' + (isMe ? 'me' : 'them');
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + (isMe ? 'me' : 'them');
+
+    const textNode = document.createElement('div');
+    textNode.textContent = msg.message;
+    bubble.appendChild(textNode);
+
+    const meta = document.createElement('span');
+    meta.className = 'chat-bubble-meta';
+    const when = msg.createdAt ? new Date(msg.createdAt) : new Date();
+    meta.textContent = when.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    bubble.appendChild(meta);
+
+    row.appendChild(bubble);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  };
+
+  // Helper to load conversations
+  const loadConversations = async () => {
+    try {
+      const res = await api('/api/chat/conversations');
+      const conversations = res?.data?.data || res?.data || [];
+
+      if (!conversations.length) {
+        chatListContainer.innerHTML = '<p class="muted" style="text-align:center;padding:20px;">No conversations yet.</p>';
+        return;
+      }
+
+      chatListContainer.innerHTML = '';
+      conversations.forEach(conv => {
+        const user = conv.user;
+        const isUnread = conv.unreadCount > 0;
+        const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+
+        const div = el('div', {
+          class: `chat-list-item ${isUnread ? 'unread' : ''}`
+        }, [
+          el('div', { class: 'chat-list-avatar' }, [initial]),
+          el('div', { class: 'chat-list-content' }, [
+            el('div', { class: 'chat-list-header' }, [
+              el('div', { class: 'chat-list-name' }, [user.name]),
+              el('div', { class: 'chat-list-time' }, [new Date(conv.lastMessageTime).toLocaleDateString()])
+            ]),
+            el('div', { class: 'chat-list-footer' }, [
+              el('div', { class: 'chat-list-message' }, [conv.lastMessage]),
+              isUnread ? el('div', { class: 'chat-list-badge' }, [String(conv.unreadCount)]) : null
+            ])
+          ])
+        ]);
+        div.onclick = () => location.href = `/chat?farmerId=${user._id}&farmerName=${encodeURIComponent(user.name)}`;
+        chatListContainer.appendChild(div);
+      });
+    } catch (e) {
+      console.error('Failed to load conversations', e);
+    }
+  };
+
+  // Initialize Socket.IO client (global io comes from script tag)
+  const socket = window.io ? window.io() : null;
+  if (socket) {
+    socket.emit('join', info._id);
+
+    socket.on('receiveMessage', (msg) => {
+      // If in list view, refresh the list
+      if (!otherUserId && chatListContainer && !chatListContainer.hidden) {
+        loadConversations();
+      } else {
+        appendMessage(msg);
+      }
+    });
+
+    socket.on('messageSent', (msg) => {
+      appendMessage(msg);
+    });
+  }
+
   // If no specific chat is selected, show conversation list
   if (!otherUserId) {
     if (chatListContainer) chatListContainer.hidden = false;
@@ -380,85 +488,9 @@ export function mountChatPage() {
     const chatCard = document.getElementById('chatCard');
     if (chatCard) chatCard.style.display = 'none'; // Hide header in list view
 
-    (async () => {
-      try {
-        const res = await api('/api/chat/conversations');
-        const conversations = res?.data?.data || res?.data || [];
-
-        if (!conversations.length) {
-          chatListContainer.innerHTML = '<p class="muted" style="text-align:center;padding:20px;">No conversations yet.</p>';
-          return;
-        }
-
-        chatListContainer.innerHTML = '';
-        conversations.forEach(conv => {
-          const user = conv.user;
-          const isUnread = conv.unreadCount > 0;
-          const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
-
-          const div = el('div', {
-            class: `chat-list-item ${isUnread ? 'unread' : ''}`
-          }, [
-            el('div', { class: 'chat-list-avatar' }, [initial]),
-            el('div', { class: 'chat-list-content' }, [
-              el('div', { class: 'chat-list-header' }, [
-                el('div', { class: 'chat-list-name' }, [user.name]),
-                el('div', { class: 'chat-list-time' }, [new Date(conv.lastMessageTime).toLocaleDateString()])
-              ]),
-              el('div', { class: 'chat-list-footer' }, [
-                el('div', { class: 'chat-list-message' }, [conv.lastMessage]),
-                isUnread ? el('div', { class: 'chat-list-badge' }, [String(conv.unreadCount)]) : null
-              ])
-            ])
-          ]);
-          div.onclick = () => location.href = `/chat?farmerId=${user._id}&farmerName=${encodeURIComponent(user.name)}`;
-          chatListContainer.appendChild(div);
-        });
-      } catch (e) {
-        console.error('Failed to load conversations', e);
-      }
-    })();
+    loadConversations();
     return; // Stop here, don't load chat logic
   }
-
-  // ... (Existing chat logic) ...
-
-  const appendMessage = (msg) => {
-    if (!msg) return;
-    const senderId = msg.sender?._id || msg.sender;
-    const receiverId = msg.receiver?._id || msg.receiver;
-
-    // If this is the first message and we don't know the other user yet,
-    // infer them from the message (so farmer opening /chat directly still sees messages).
-    if (!otherUserId) {
-      otherUserId = senderId === info._id ? receiverId : senderId;
-    }
-
-    // Only show messages in this conversation once we have the other user ID
-    if (
-      !(
-        (senderId === info._id && receiverId === otherUserId) ||
-        (senderId === otherUserId && receiverId === info._id)
-      )
-    ) {
-      return;
-    }
-    const row = document.createElement('div');
-    row.className = 'chat-row ' + (senderId === info._id ? 'me' : 'them');
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble ' + (senderId === info._id ? 'me' : 'them');
-    const textNode = document.createElement('div');
-    textNode.textContent = msg.message;
-    bubble.appendChild(textNode);
-    const meta = document.createElement('span');
-    meta.className = 'chat-bubble-meta';
-    const when = msg.createdAt ? new Date(msg.createdAt) : new Date();
-    meta.textContent = when.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-    bubble.appendChild(meta);
-    row.appendChild(bubble);
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  };
 
   const loadCropAndHistory = async () => {
     try {
@@ -510,20 +542,6 @@ export function mountChatPage() {
       console.error('Failed to load chat:', err);
     }
   };
-
-  // Initialize Socket.IO client (global io comes from script tag)
-  const socket = window.io ? window.io() : null;
-  if (socket) {
-    socket.emit('join', info._id);
-
-    socket.on('receiveMessage', (msg) => {
-      appendMessage(msg);
-    });
-
-    socket.on('messageSent', (msg) => {
-      appendMessage(msg);
-    });
-  }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();

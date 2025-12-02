@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Chat from '../models/Chat.js';
 
 /**
@@ -28,7 +29,13 @@ const initializeSocket = (io) => {
      */
     socket.on('sendMessage', async (data) => {
       try {
+        console.log('socket.sendMessage received:', data);
         const { senderId, receiverId, message, cropId } = data;
+
+        if (!mongoose.Types.ObjectId.isValid(senderId) || !mongoose.Types.ObjectId.isValid(receiverId)) {
+          console.error('Invalid sender or receiver ID in socket message');
+          return;
+        }
 
         // Save message to database
         const chatMessage = await Chat.create({
@@ -44,11 +51,8 @@ const initializeSocket = (io) => {
           .populate('receiver', 'name email role')
           .populate('crop', 'name price');
 
-        // Send message to receiver if they are online
-        const receiverSocketId = connectedUsers.get(receiverId);
-        if (receiverSocketId) {
-          io.to(receiverSocketId).emit('receiveMessage', populatedMessage);
-        }
+        // Send message to receiver (room is userId)
+        io.to(receiverId).emit('receiveMessage', populatedMessage);
 
         // Send confirmation back to sender
         socket.emit('messageSent', populatedMessage);

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import asyncHandler from 'express-async-handler';
 import Chat from '../models/Chat.js';
 
@@ -8,13 +9,23 @@ import Chat from '../models/Chat.js';
  */
 const getChatHistory = asyncHandler(async (req, res) => {
   const { userId } = req.params; // Other user's ID
-  const currentUserId = req.user._id;
+  console.log('getChatHistory request:', { userId, currentUserId: req.user._id });
+
+  let currentUserId, otherUserId;
+  try {
+    currentUserId = new mongoose.Types.ObjectId(req.user._id);
+    otherUserId = new mongoose.Types.ObjectId(userId);
+  } catch (error) {
+    console.error('Invalid ID format in getChatHistory:', error);
+    res.status(400);
+    throw new Error('Invalid user ID format');
+  }
 
   // Find all messages between current user and specified user
   const messages = await Chat.find({
     $or: [
-      { sender: currentUserId, receiver: userId },
-      { sender: userId, receiver: currentUserId },
+      { sender: currentUserId, receiver: otherUserId },
+      { sender: otherUserId, receiver: currentUserId },
     ],
   })
     .populate('sender', 'name email role')
@@ -68,7 +79,7 @@ const sendMessage = asyncHandler(async (req, res) => {
  * @access Private
  */
 const getConversations = asyncHandler(async (req, res) => {
-  const currentUserId = req.user._id;
+  const currentUserId = new mongoose.Types.ObjectId(req.user._id);
 
   // Get all unique users current user has chatted with
   const conversations = await Chat.aggregate([
@@ -121,6 +132,7 @@ const getConversations = asyncHandler(async (req, res) => {
     {
       $project: {
         _id: 1,
+        'user._id': 1,
         'user.name': 1,
         'user.email': 1,
         'user.role': 1,
